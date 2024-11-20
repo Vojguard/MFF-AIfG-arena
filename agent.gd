@@ -25,21 +25,24 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	for p in range(_polygons.size()):
 		if _check_polygon(ship.position, _polygons[p]):
 			my_polygon = p
-			print(my_polygon)
 		if _check_polygon(closest_gem, _polygons[p]):
 			gem_polygon = p
 	
-	if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
-		thrust = 1
-	else:
-		thrust = 0
+	if my_polygon == gem_polygon or _find_if_neighbors(_neighbors[my_polygon], gem_polygon):
+		if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
+			thrust = 1
+		else:
+			thrust = 0
 	
-	if ship.position.angle_to_point(closest_gem) > (ship.rotation):
-		spin = 1
-	elif ship.position.angle_to_point(closest_gem) < (ship.rotation):
-		spin = -1
+		if ship.position.angle_to_point(closest_gem) > (ship.rotation):
+			spin = 1
+		elif ship.position.angle_to_point(closest_gem) < (ship.rotation):
+			spin = -1
+		else:
+			spin = 0
 	else:
 		spin = 0
+		thrust = 0
 	
 	return [spin, thrust, false]
 
@@ -53,6 +56,12 @@ func _check_polygon(point : Vector2, polygon : PackedVector2Array) -> bool:
 		.angle_to(Vector2(point.x - second_vertex.x, point.y - second_vertex.y))
 	if angle >= 2 * PI:
 		return true
+	return false
+
+func _find_if_neighbors(one : Array, two : int) -> bool:
+	for neigh in one:
+		if neigh == two:
+			return true
 	return false
 
 # Called every time the agent has bounced off a wall.
