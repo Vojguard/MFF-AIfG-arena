@@ -20,19 +20,23 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		if ship.position.distance_to(gem) < ship.position.distance_to(closest_gem):
 			closest_gem = gem
 	
+	
+	
+	var my_poly : int = -1
+	var gem_poly : int = -1
+	for p in range(_polygons.size()):
+		if Geometry2D.is_point_in_polygon(ship.position, _polygons[p]):
+			my_poly = p
+		if Geometry2D.is_point_in_polygon(closest_gem, _polygons[p]):
+			gem_poly = p
+	
 	debug_path.clear_points()
+	debug_path.add_point(_calculate_poly_center(_polygons[my_poly]))
 	debug_path.add_point(ship.position)
 	debug_path.add_point(closest_gem)
+	debug_path.add_point(_calculate_poly_center(_polygons[gem_poly]))
 	
-	var my_polygon : int = -1
-	var gem_polygon : int = -1
-	for p in range(_polygons.size()):
-		if _check_polygon(ship.position, _polygons[p]):
-			my_polygon = p
-		if _check_polygon(closest_gem, _polygons[p]):
-			gem_polygon = p
-	
-	if my_polygon == gem_polygon or _find_if_neighbors(_neighbors[my_polygon], gem_polygon):
+	if my_poly == gem_poly or _find_if_neighbors(_neighbors[my_poly], gem_poly):
 		if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
 			thrust = true
 		else:
@@ -50,23 +54,17 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	
 	return [spin, thrust, false]
 
-func _check_polygon(point : Vector2, polygon : PackedVector2Array) -> bool:
-	var is_inside := false
-	var angle := 0.0
-	for i in range(polygon.size()):
-		var first_vertex : Vector2 = polygon[i]
-		var second_vertex : Vector2 = polygon[(i + 1) % polygon.size()]
-		angle += Vector2(point.x - first_vertex.x, point.y - first_vertex.y)\
-		.angle_to(Vector2(point.x - second_vertex.x, point.y - second_vertex.y))
-	if angle >= 2 * PI:
-		return true
-	return false
-
 func _find_if_neighbors(one : Array, two : int) -> bool:
 	for neigh in one:
 		if neigh == two:
 			return true
 	return false
+
+func _calculate_poly_center(polygon : PackedVector2Array) -> Vector2:
+	var sum := Vector2.ZERO
+	for vertex in polygon:
+		sum += vertex
+	return sum / polygon.size()
 
 # Called every time the agent has bounced off a wall.
 func bounce():
