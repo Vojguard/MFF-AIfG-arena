@@ -45,6 +45,7 @@ process_mode = 1
 editor_description = "This is the description."
 script = ExtResource("1_1v0vr")
 use_agent = true
+show_navmesh = true
 
 [node name="walls" type="Node2D" parent="." groups=["walls"]]
 unique_name_in_owner = true

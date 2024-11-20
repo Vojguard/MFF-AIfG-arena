@@ -20,7 +20,16 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		if ship.position.distance_to(gem) < ship.position.distance_to(closest_gem):
 			closest_gem = gem
 	
-	if (closest_gem - (ship.position + ship.velocity)).length() > 10 :
+	var my_polygon : int = -1
+	var gem_polygon : int = -1
+	for p in range(_polygons.size()):
+		if _check_polygon(ship.position, _polygons[p]):
+			my_polygon = p
+			print(my_polygon)
+		if _check_polygon(closest_gem, _polygons[p]):
+			gem_polygon = p
+	
+	if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
 		thrust = 1
 	else:
 		thrust = 0
@@ -33,6 +42,18 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		spin = 0
 	
 	return [spin, thrust, false]
+
+func _check_polygon(point : Vector2, polygon : PackedVector2Array) -> bool:
+	var is_inside := false
+	var angle := 0.0
+	for i in range(polygon.size()):
+		var first_vertex : Vector2 = polygon[i]
+		var second_vertex : Vector2 = polygon[(i + 1) % polygon.size()]
+		angle += Vector2(point.x - first_vertex.x, point.y - first_vertex.y)\
+		.angle_to(Vector2(point.x - second_vertex.x, point.y - second_vertex.y))
+	if angle >= 2 * PI:
+		return true
+	return false
 
 # Called every time the agent has bounced off a wall.
 func bounce():
