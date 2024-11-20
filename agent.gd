@@ -20,6 +20,10 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		if ship.position.distance_to(gem) < ship.position.distance_to(closest_gem):
 			closest_gem = gem
 	
+	debug_path.clear_points()
+	debug_path.add_point(ship.position)
+	debug_path.add_point(closest_gem)
+	
 	var my_polygon : int = -1
 	var gem_polygon : int = -1
 	for p in range(_polygons.size()):
@@ -30,9 +34,9 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	
 	if my_polygon == gem_polygon or _find_if_neighbors(_neighbors[my_polygon], gem_polygon):
 		if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
-			thrust = 1
+			thrust = true
 		else:
-			thrust = 0
+			thrust = false
 	
 		if ship.position.angle_to_point(closest_gem) > (ship.rotation):
 			spin = 1
@@ -42,7 +46,7 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 			spin = 0
 	else:
 		spin = 0
-		thrust = 0
+		thrust = false
 	
 	return [spin, thrust, false]
 
