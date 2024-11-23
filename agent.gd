@@ -6,12 +6,15 @@ extends Node2D
 var ticks = 0
 var spin = 0
 var thrust = false
+var _polys : Array[PackedVector2Array]
 
 # This method is called on every tick to choose an action.  See README.md
 # for a detailed description of its arguments and return value.
 func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2], 
 			_polygons: Array[PackedVector2Array], _neighbors: Array[Array]):
-
+	
+	_polys = _polygons
+	
 	# This is a dummy agent that just moves around randomly.
 	# Replace this code with your actual implementation.
 	ticks += 1
@@ -30,27 +33,28 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		if Geometry2D.is_point_in_polygon(closest_gem, _polygons[p]):
 			gem_poly = p
 	
+	var target_pos = Vector2.ZERO
+	if my_poly == gem_poly or _find_if_neighbors(_neighbors[my_poly], gem_poly):
+		target_pos = closest_gem
+	else:
+		target_pos = _calculate_poly_center(_polygons[_bfs(my_poly, gem_poly, _neighbors)])
+	
 	debug_path.clear_points()
 	debug_path.add_point(_calculate_poly_center(_polygons[my_poly]))
 	debug_path.add_point(ship.position)
-	debug_path.add_point(closest_gem)
-	debug_path.add_point(_calculate_poly_center(_polygons[gem_poly]))
+	debug_path.add_point(target_pos)
 	
-	if my_poly == gem_poly or _find_if_neighbors(_neighbors[my_poly], gem_poly):
-		if (closest_gem - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
-			thrust = true
-		else:
-			thrust = false
+	if (target_pos - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
+		thrust = true
+	else:
+		thrust = false
 	
-		if ship.position.angle_to_point(closest_gem) > (ship.rotation):
-			spin = 1
-		elif ship.position.angle_to_point(closest_gem) < (ship.rotation):
-			spin = -1
-		else:
-			spin = 0
+	if ship.position.angle_to_point(target_pos) > (ship.rotation):
+		spin = 1
+	elif ship.position.angle_to_point(target_pos) < (ship.rotation):
+		spin = -1
 	else:
 		spin = 0
-		thrust = false
 	
 	return [spin, thrust, false]
 
@@ -65,6 +69,30 @@ func _calculate_poly_center(polygon : PackedVector2Array) -> Vector2:
 	for vertex in polygon:
 		sum += vertex
 	return sum / polygon.size()
+
+func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array]) -> int:
+	var queue := []
+	var visited := {}
+	var parent := {}
+	
+	queue.append(your_poly)
+	visited[your_poly] = true
+	parent[your_poly] = null
+	
+	while queue.size() > 0:
+		var current = queue.pop_front()
+		
+		if current == target_poly:
+			while parent[current] != your_poly:
+				current = parent[current]
+			return current
+		
+		for neighbor in neighbors[current]:
+			if neighbor not in visited:
+				queue.append(neighbor)
+				visited[neighbor] = true
+				parent[neighbor] = current
+	return -1
 
 # Called every time the agent has bounced off a wall.
 func bounce():
