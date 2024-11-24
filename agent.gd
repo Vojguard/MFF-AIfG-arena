@@ -44,17 +44,17 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	debug_path.add_point(ship.position)
 	debug_path.add_point(target_pos)
 	
-	if (target_pos - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
-		thrust = true
-	else:
-		thrust = false
-	
-	if ship.position.angle_to_point(target_pos) > (ship.rotation):
+	if ship.position.angle_to_point(target_pos) > (ship.rotation + 0.1):
 		spin = 1
-	elif ship.position.angle_to_point(target_pos) < (ship.rotation):
+	elif ship.position.angle_to_point(target_pos) < (ship.rotation - 0.1):
 		spin = -1
 	else:
 		spin = 0
+	
+	if (target_pos - (ship.position + ship.velocity)).length() * ship.ACCEL > (ship.velocity).length() :
+		thrust = true
+	else:
+		thrust = false
 	
 	return [spin, thrust, false]
 
@@ -100,8 +100,8 @@ func bounce():
 
 # Called every time a gem has been collected.
 func gem_collected():
-    return
+	return
 
 # Called every time a new level has been reached.
 func new_level():
-    return
+	return
