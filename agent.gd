@@ -100,4 +100,8 @@ func bounce():
 
 # Called every time a gem has been collected.
 func gem_collected():
-	return
+    return
+
+# Called every time a new level has been reached.
+func new_level():
+    return
