@@ -38,14 +38,20 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		target_pos = closest_gem
 	else:
 		var path_to_gem := _bfs(my_poly, gem_poly, _neighbors)
-		target_pos = _calculate_poly_center(_polygons[path_to_gem[0]])
-		debug_path.add_point(target_pos)
+		var center_next := _calculate_poly_center(_polygons[path_to_gem[0]])
+		debug_path.add_point(center_next)
+		target_pos = center_next
 		if path_to_gem.size() > 1:
-			closest_gem = _calculate_poly_center(_polygons[path_to_gem[1]])
-		debug_path.add_point(closest_gem)
-		var angle : float = Vector2(ship.position - target_pos).angle_to(Vector2(closest_gem - target_pos))
-		if  angle < 2 * PI / 5 and angle > 3 * PI / 5:
-			target_pos = closest_gem
+			var center_after := _calculate_poly_center(_polygons[path_to_gem[1]])
+			debug_path.add_point(center_after)
+			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(center_after - target_pos))
+			if  angle < 2 * PI / 5 and angle > 3 * PI / 5:
+				target_pos = center_after
+		else:
+			debug_path.add_point(closest_gem)
+			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - target_pos))
+			if  angle < 2 * PI / 5 and angle > 3 * PI / 5:
+				target_pos = closest_gem
 	
 	if ship.position.angle_to_point(target_pos) > (ship.rotation + 0.1):
 		spin = 1
