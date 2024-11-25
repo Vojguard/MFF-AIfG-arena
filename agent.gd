@@ -52,7 +52,8 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 			debug_path.add_point(closest_gem)
 			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - center_next))
 			if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
-				target_pos = closest_gem
+				if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(closest_gem)]), _walls):
+					target_pos = closest_gem
 	
 	if ship.position.angle_to_point(target_pos) > (ship.rotation + 0.1):
 		spin = 1
@@ -60,11 +61,14 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		spin = -1
 	else:
 		spin = 0
-	
-	if (target_pos - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
-		thrust = true
-	else:
+	print(spin)
+	if spin != 0 and ship.velocity != Vector2.ZERO:
 		thrust = false
+	else:
+		if (target_pos - (ship.position + ship.velocity)).length() > (ship.velocity).length() :
+			thrust = true
+		else:
+			thrust = false
 	
 	return [spin, thrust, false]
 
