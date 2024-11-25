@@ -44,13 +44,14 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		if path_to_gem.size() > 1:
 			var center_after := _calculate_poly_center(_polygons[path_to_gem[1]])
 			debug_path.add_point(center_after)
-			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(center_after - target_pos))
-			if  angle < 2 * PI / 5 and angle > 3 * PI / 5:
-				target_pos = center_after
+			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(center_after - center_next))
+			if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
+				if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(center_after)]), _walls):
+					target_pos = center_after
 		else:
 			debug_path.add_point(closest_gem)
-			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - target_pos))
-			if  angle < 2 * PI / 5 and angle > 3 * PI / 5:
+			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - center_next))
+			if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
 				target_pos = closest_gem
 	
 	if ship.position.angle_to_point(target_pos) > (ship.rotation + 0.1):
@@ -105,6 +106,12 @@ func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array]) -> Array[
 				visited[neighbor] = true
 				parent[neighbor] = current
 	return [-1]
+
+func _wall_in_path(path: PackedVector2Array, walls: Array[PackedVector2Array]) -> bool:
+	for wall in walls:
+		if not Geometry2D.intersect_polyline_with_polygon(path, wall).is_empty():
+			return true
+	return false
 
 # Called every time the agent has bounced off a wall.
 func bounce():
