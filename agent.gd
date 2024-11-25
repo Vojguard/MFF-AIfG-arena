@@ -61,7 +61,7 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		spin = -1
 	else:
 		spin = 0
-	print(spin)
+	
 	if spin != 0 and ship.velocity != Vector2.ZERO:
 		thrust = false
 	else:
