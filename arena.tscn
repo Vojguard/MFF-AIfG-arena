@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://dkbyqg4etp3pv"]
+[gd_scene load_steps=20 format=3 uid="uid://dkbyqg4etp3pv"]
 
 [ext_resource type="Script" path="res://arena.gd" id="1_1v0vr"]
 [ext_resource type="Script" path="res://ship.gd" id="1_cqiuf"]
@@ -12,6 +12,7 @@
 [ext_resource type="AudioStream" uid="uid://chjlq4jda1x8p" path="res://sounds/Glitch_13.wav" id="9_avenh"]
 [ext_resource type="AudioStream" uid="uid://ddc7rp5u5d37p" path="res://sounds/Whoosh 3.wav" id="9_ogv0w"]
 [ext_resource type="AudioStream" uid="uid://cevcnd68cbs1f" path="res://sounds/Impact_2_Mid.wav" id="10_3iuv8"]
+[ext_resource type="Texture2D" uid="uid://ctpfcqnkof3be" path="res://images/icon.svg" id="13_rkx1o"]
 
 [sub_resource type="NavigationPolygon" id="NavigationPolygon_f85l1"]
 vertices = PackedVector2Array(1330, 830, 70.9375, 830, 70.0625, 105, 1330, 105)
@@ -193,3 +194,7 @@ stream = ExtResource("10_3iuv8")
 
 [node name="next_level_sound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("9_ogv0w")
+
+[node name="debug_sprite" type="Sprite2D" parent="."]
+scale = Vector2(0.1, 0.1)
+texture = ExtResource("13_rkx1o")

@@ -2,6 +2,7 @@ extends Node2D
 
 @onready var ship = get_parent()
 @onready var debug_path = ship.get_node('../debug_path')
+@onready var debug_sprite = ship.get_node('../debug_sprite')
 
 var ticks = 0
 var spin = 0
@@ -76,6 +77,8 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		spin = -1
 	else:
 		spin = 0
+	
+	debug_sprite.position = (target_pos - ship.velocity)
 	
 	if spin != 0 and ship.velocity != Vector2.ZERO:
 		thrust = false
