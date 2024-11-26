@@ -40,24 +40,39 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		var path_to_gem := _bfs(my_poly, gem_poly, _neighbors)
 		var center_next := _calculate_poly_center(_polygons[path_to_gem[0]])
 		debug_path.add_point(center_next)
-		target_pos = center_next
-		if path_to_gem.size() > 1:
-			var center_after := _calculate_poly_center(_polygons[path_to_gem[1]])
-			debug_path.add_point(center_after)
-			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(center_after - center_next))
-			if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
-				if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(center_after)]), _walls):
-					target_pos = center_after
-		else:
-			debug_path.add_point(closest_gem)
-			var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - center_next))
-			if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
-				if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(closest_gem)]), _walls):
-					target_pos = closest_gem
+		
+		path_to_gem.append(-1)
+		for step in path_to_gem:
+			var poly_center : Vector2
+			if step == -1:
+				poly_center = closest_gem
+			else:
+				poly_center = _calculate_poly_center(_polygons[step])
+			debug_path.add_point(poly_center)
+			if not _wall_in_path(PackedVector2Array([ship.position,poly_center]), _walls):
+				target_pos = poly_center
+			else:
+				break
+	debug_path.add_point(closest_gem)
+		
+		#target_pos = center_next
+		#if path_to_gem.size() > 1:
+			#var center_after := _calculate_poly_center(_polygons[path_to_gem[1]])
+			#debug_path.add_point(center_after)
+			#var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(center_after - center_next))
+			#if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
+				#if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(center_after)]), _walls):
+					#target_pos = center_after
+		#else:
+			#debug_path.add_point(closest_gem)
+			#var angle : float = Vector2(ship.position - center_next).angle_to(Vector2(closest_gem - center_next))
+			#if  angle < 2 * PI / 5 or angle > 8 * PI / 5:
+				#if not _wall_in_path(PackedVector2Array([Vector2(ship.position), Vector2(closest_gem)]), _walls):
+					#target_pos = closest_gem
 	
-	if ship.position.angle_to_point(target_pos) > (ship.rotation + 0.1):
+	if ship.position.angle_to_point(target_pos - ship.velocity) > (ship.rotation + 0.1):
 		spin = 1
-	elif ship.position.angle_to_point(target_pos) < (ship.rotation - 0.1):
+	elif ship.position.angle_to_point(target_pos - ship.velocity) < (ship.rotation - 0.1):
 		spin = -1
 	else:
 		spin = 0
