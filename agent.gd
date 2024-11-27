@@ -20,7 +20,6 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	for gem : Vector2 in _gems:
 		if ship.position.distance_to(gem) < ship.position.distance_to(closest_gem):
 			closest_gem = gem
-	
 	debug_path.clear_points()
 	
 	var my_poly : int = -1
@@ -30,11 +29,10 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 			my_poly = p
 		if Geometry2D.is_point_in_polygon(closest_gem, _polygons[p]):
 			gem_poly = p
-	
 	debug_path.add_point(_calculate_poly_center(_polygons[my_poly]))
 	debug_path.add_point(ship.position)
 	
-	var target_pos = Vector2.ZERO
+	var target_pos = _calculate_poly_center(_polygons[0])
 	if my_poly == gem_poly:
 		target_pos = closest_gem
 	else:
