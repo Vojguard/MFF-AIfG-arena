@@ -64,11 +64,11 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 			if not _wall_in_path(PackedVector2Array([ship.position,poly_center]), _walls):
 				target_pos = poly_center
 			else:
-				#if my_poly != step:
-					#var po := _find_common_vertex(_polygons[my_poly], _polygons[step])
-					#if po.size() > 1:
-						#target_pos = (po[0] + po[1]) / 2
-						#debug_path.add_point(target_pos)
+				if _find_if_neighbors(_neighbors[my_poly], step):
+					var po := _find_common_vertex(_polygons[my_poly], _polygons[step])
+					if po.size() > 1:
+						target_pos = (po[0] + po[1]) / 2
+						debug_path.add_point(target_pos)
 				break
 	debug_path.add_point(closest_gem)
 	
