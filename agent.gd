@@ -35,10 +35,22 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 	debug_path.add_point(ship.position)
 	
 	var target_pos = Vector2.ZERO
-	if my_poly == gem_poly or _find_if_neighbors(_neighbors[my_poly], gem_poly):
+	if my_poly == gem_poly:
 		target_pos = closest_gem
 	else:
-		var path_to_gem := _bfs(my_poly, gem_poly, _neighbors)
+		#var path_to_gem := _bfs(my_poly, gem_poly, _neighbors, true)
+		#path_to_gem.push_front(my_poly)
+		#for i in range(1, path_to_gem.size()):
+			#var poly_this = path_to_gem[i - 1]
+			#var poly_next = path_to_gem[i]
+			#var po := _find_common_vertex(_polygons[poly_this], _polygons[poly_next])
+			#var edge_center : Vector2 = (po[0] + po[1]) / 2
+			#debug_path.add_point(edge_center)
+			#target_pos = edge_center
+			#if not _wall_in_path(PackedVector2Array([ship.position,edge_center]), _walls):
+				#target_pos = edge_center
+		
+		var path_to_gem := _bfs(my_poly, gem_poly, _neighbors, true)
 		var center_next := _calculate_poly_center(_polygons[path_to_gem[0]])
 		debug_path.add_point(center_next)
 		path_to_gem.append(-1)
@@ -52,6 +64,11 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 			if not _wall_in_path(PackedVector2Array([ship.position,poly_center]), _walls):
 				target_pos = poly_center
 			else:
+				#if my_poly != step:
+					#var po := _find_common_vertex(_polygons[my_poly], _polygons[step])
+					#if po.size() > 1:
+						#target_pos = (po[0] + po[1]) / 2
+						#debug_path.add_point(target_pos)
 				break
 	debug_path.add_point(closest_gem)
 	
@@ -70,7 +87,7 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		else:
 			spin = 1
 	
-	debug_sprite.position = (target_pos)
+	debug_sprite.position = (target_pos - ship.velocity)
 	
 	return [spin, thrust, false]
 
@@ -86,7 +103,7 @@ func _calculate_poly_center(polygon : PackedVector2Array) -> Vector2:
 		sum += vertex
 	return sum / polygon.size()
 
-func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array]) -> Array[int]:
+func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array], reversed : bool) -> Array[int]:
 	var queue := []
 	var visited := {}
 	var parent := {}
@@ -103,7 +120,7 @@ func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array]) -> Array[
 			while current != your_poly:
 				current = parent[current]
 				path.append(current)
-			path.reverse()
+			if reversed: path.reverse()
 			return path
 		
 		for neighbor in neighbors[current]:
@@ -118,6 +135,13 @@ func _wall_in_path(path: PackedVector2Array, walls: Array[PackedVector2Array]) -
 		if not Geometry2D.intersect_polyline_with_polygon(path, wall).is_empty():
 			return true
 	return false
+
+func _find_common_vertex(poly1 : PackedVector2Array, poly2 : PackedVector2Array) -> PackedVector2Array:
+	var commons : PackedVector2Array = []
+	for vert in poly1:
+		if Geometry2D.is_point_in_polygon(vert, poly2):
+			commons.append(vert)
+	return commons
 
 # Called every time the agent has bounced off a wall.
 func bounce():
