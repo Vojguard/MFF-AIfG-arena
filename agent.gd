@@ -48,7 +48,7 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 				poly_center = closest_gem
 			else:
 				poly_center = _calculate_poly_center(_polygons[step])
-			#debug_path.add_point(poly_center)
+			debug_path.add_point(poly_center)
 			if not _wall_in_path(PackedVector2Array([ship.position,poly_center]), _walls):
 				target_pos = poly_center
 			else:
@@ -70,7 +70,7 @@ func action(_walls: Array[PackedVector2Array], _gems: Array[Vector2],
 		else:
 			spin = 1
 	
-	debug_sprite.position = (target_pos - ship.velocity)
+	debug_sprite.position = (target_pos)
 	
 	return [spin, thrust, false]
 
@@ -100,7 +100,7 @@ func _bfs(your_poly : int, target_poly : int, neighbors: Array[Array]) -> Array[
 		
 		if current == target_poly:
 			var path : Array[int] = []
-			while parent[current] != your_poly:
+			while current != your_poly:
 				current = parent[current]
 				path.append(current)
 			path.reverse()
